@@ -1,0 +1,24 @@
+
+from edubit import *
+
+display.show(Image.HAPPY)                            # show happy face on microbit display
+while True:
+	init()                                       # initialize EDU:BIT
+	sets_servo_position(S1, position=0)          # close the pedestrian gate
+	sleep(500)
+	set_led(Red, 0)                             
+	set_led(Yellow, 0)                          
+	set_led(Green, 1)                            # traffic light turns green
+	sleep(2000)
+
+	set_led(Red, 0)
+	set_led(Yellow, 1)                           # traffic light turns yellow
+	set_led(Green, 0)                           
+	sleep(1000)
+
+	set_led(Red, 1)                              # traffic light turns red
+	set_led(Yellow, 0)
+	set_led(Green, 0)
+	sleep(500)
+	sets_servo_position(S1, position=90)         # open the pedestrian gate
+	sleep(2000)
