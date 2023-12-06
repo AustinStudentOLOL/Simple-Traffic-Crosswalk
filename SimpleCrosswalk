@@ -1,0 +1,44 @@
+# simple FSM. should be RED for 1 second, GREEN for 1/2 second.
+# setting event to EVT_STOP turns everything off and ends the loop.
+from time import sleep
+
+red = True
+green = False
+
+STAT_RED = 1
+STAT_GREEN = 2
+STAT_END = 99
+
+EVT_NONE = 0
+EVT_STOP = 1
+
+event = EVT_NONE
+state = STAT_GREEN
+count = 0
+for _ in range(100): # TESTING. Would most likely be while state <> STAT_END: in a real app.
+    sleep(0.1)
+    count += 1
+    # regardless of state, process the STOP event
+    if event == EVT_STOP:
+        state = STAT_END
+        red = false
+        green = false       
+    if state == STAT_RED:
+        if count > 10:
+            state = STAT_GREEN
+            red = False
+            green = True
+            count = 0
+    if state == STAT_GREEN:
+        if count > 5:
+            state = STAT_RED
+            red = True
+            green = False
+            count = 0
+    if red:
+        print("RED")
+    if green:
+        print("GREEN")
+    if not (red or green):
+        print("STOP")
+        break
