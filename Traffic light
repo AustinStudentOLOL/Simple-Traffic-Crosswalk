@@ -1,0 +1,66 @@
+from machine import Pin
+import time 
+import utime
+
+#vertical lights
+yellow1 = Pin(3, Pin.OUT)
+green1 = Pin(4, Pin.OUT)
+red1 = Pin(5, Pin.OUT)
+
+#horizontal lights 
+red2 = Pin(6, Pin.OUT)
+yellow2 = Pin(7, Pin.OUT)
+green2 = Pin(8, Pin.OUT)
+
+#Emergency Button
+ebutton = (2, Pin.IN, Pin.PULL_DOWN)
+
+#light logic
+set = 1
+time = utime.ticks_ms()
+
+# Lights Logic
+def light_logic():
+    global set, time
+    currenTime = utime.ticks_ms()
+
+    # set1
+    if set == 1:
+        pin_high(green1)
+        pin_high(red2)
+        if  utime.ticks_diff (currenTime, time) > 10000:
+            pin_low(green1)
+            pin_low(red2)
+            time = millis()
+            set = 2
+
+    # set 2
+    if set == 2:
+        pin_high(yellow1)
+        pin_high(Red_2)
+        if utime.ticks_diff (currenTime, time) > 5000:
+            pin_low(yellow1)
+            pin_low(red2)
+            time = millis()
+            set = 3
+
+
+            time = millis()
+            set = 4
+
+    # set 4
+    if set == 4:
+        pin_high(yellow2)
+        pin_high(Red_1)
+        if utime.ticks_diff (currenTime, time) > 5000:
+            pin_low(yellow2)
+            pin_low(red1)
+            time = millis()
+            set = 1
+
+
+.
+while True:
+    light_logic()
+
+
