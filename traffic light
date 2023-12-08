@@ -1,0 +1,132 @@
+# Import libraries
+from machine import Pin
+from time import sleep_ms, ticks_ms
+import utime
+
+# Define pin numbers
+Green_1 = Pin(4, Pin.OUT)
+Yellow_1 = Pin(3, Pin.OUT)
+Red_1 = Pin(5, Pin.OUT)
+Green_2 = Pin(10, Pin.OUT)
+Yellow_2 = Pin(9, Pin.OUT)
+Red_2 = Pin(8, Pin.OUT)
+servoSwitch = 6
+servoPin1 = 11
+servoPin2 = 10
+Button = 2
+
+# Create Pin objects
+pinServoSwitch = Pin(servoSwitch, Pin.IN)
+pinButton = Pin(Button, Pin.IN)
+servo1 = Pin(servoPin1, Pin.OUT)
+servo2 = Pin(servoPin2, Pin.OUT)
+
+# Lights Logic
+def light_logic():
+    global time, set
+    currenTime = utime.ticks_ms()
+
+
+    # set1
+    if set == 1:
+        Green_1.on()
+        Red_2.on()
+        if utime.ticks_diff (currenTime, time) > 10000:
+            Green_1.off()
+            Red_2.off()
+            time = ticks_ms()
+            set = 2
+
+    # set 2
+    if set == 2:
+        Yellow_1.on()
+        Red_2.on()
+        if utime.ticks_diff (currenTime, time) > 5000:
+            pinYellow_1.off()
+            pinRed_2.off()
+            time = ticks_ms()
+            set = 3
+
+    # set 3
+    if set == 3:
+        pinRed_1.on()
+        pinGreen_2.on()
+        if utime.ticks_diff (currenTime, time) > 10000:
+            pinRed_1.off()
+            pinGreen_2.off()
+            time = ticks_ms()
+            set = 4
+
+    # set 4
+    if set == 4:
+        Yellow_2.on()
+        Red_1.on()
+        if utime.ticks_diff (currenTime, time) > 5000:
+            pinYellow_2.off()
+            pinRed_1.off()
+            time = ticks_ms()
+            set = 1
+
+# Barricades for Railway
+def servo_button_control():
+    switch_state = pinServoSwitch.value()
+    if switch_state == 0:
+        servo1.on()
+        servo2.on()
+    else:
+        servo1.off()
+        servo2.off()
+
+# Emergency Mode
+def button_emergency():
+    global redBlinking, set, time
+    state_button = pinButton.value()
+    
+    # change State Button
+    if state_button == 0:
+        # Button is pressed
+        if not redBlinking:
+            # If not in red blinking mode, enter it
+            redBlinking = True
+            # Turn off all lights except red
+            Green_1.off()
+            Yellow_1.off()
+            Green_2.off()
+            Yellow_2.off()
+            # Start blinking red lights
+            while pinButton.value() == 0:
+                Red_1.on()
+                Red_2.on()
+                sleep_ms(1000)  # Blink interval of 1 second
+                Red_1.off()
+                Red_2.off()
+                sleep_ms(1000)
+        else:
+            # If already in red blinking mode, exit it
+            redBlinking = False
+            # Turn off all lights initially, as a reset
+            Green_1.off()
+            Yellow_1.off()
+            Red_1.off()
+            Green_2.off()
+            Yellow_2.off()
+            Red_2.off()
+            # Return to normal traffic light operation
+            set = 1  # Reset the state
+            time = ticks_ms()  # Reset the timer
+
+# Helper functions
+def pin_high(pin):
+    pin.on()
+
+def pin_low(pin):
+    pin.off()
+
+# Main function
+time = ticks_ms()
+set = 1
+redBlinking = False
+while True:
+    light_logic()
+    button_emergency()
+    servo_button_control()
